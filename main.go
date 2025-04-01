@@ -31,8 +31,13 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 	var task Task
 	reqBody := r.Body
 	if err := json.NewDecoder(reqBody).Decode(&task); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		log.Printf("Ошибка декодирования Task в TaskHandler %v \n", err)
+		return
+	}
+
+	if task.Title == "" {
+		http.Error(w, "У таски пустой title", http.StatusBadRequest)
 		return
 	}
 
@@ -47,10 +52,7 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
-	response := map[string]interface{}{
-		"status": "success",
-		"task":   task,
-	}
+	response := TaskResponse{Task: task}
 
 	if err := json.NewEncoder(w).Encode(&response); err != nil {
 		log.Printf("Ошибка кодирования ответа в TaskHandler %v", err)
