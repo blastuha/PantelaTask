@@ -52,7 +52,7 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
-	response := TaskResponse{Task: task}
+	response := task
 
 	if err := json.NewEncoder(w).Encode(&response); err != nil {
 		log.Printf("Ошибка кодирования ответа в TaskHandler %v", err)
