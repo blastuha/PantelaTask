@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 	"log"
@@ -40,6 +39,7 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 
 	// возвращаем response
 	w.Header().Set("Content-Type", "application/json")
+	// уст. статус
 	w.WriteHeader(http.StatusCreated)
 
 	response := task
@@ -72,7 +72,6 @@ func (t *TaskHandler) GetTaskList(w http.ResponseWriter, _ *http.Request) {
 
 func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	fmt.Println("vars", vars)
 	id := vars["id"]
 
 	// формируем newTask из request
@@ -96,7 +95,34 @@ func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// возвращаем обновленного пользователя в ответе json
-	if err := json.NewEncoder(w).Encode(&newTask); err != nil {
+	if err := json.NewEncoder(w).Encode(&oldTask); err != nil {
+		http.Error(w, "Ошибка сервера", http.StatusBadRequest)
+		return
+	}
+}
+
+func (t *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	// Task который хотим удалить
+	var taskToDelete Task
+	if tx := t.db.First(&taskToDelete, id); tx.Error != nil {
+		http.Error(w, "Ошибка сервера", http.StatusBadRequest)
+		return
+	}
+
+	// Удаление Task
+	if err := t.db.Delete(&taskToDelete).Error; err != nil {
+		http.Error(w, "Ошибка сервера", http.StatusBadRequest)
+		return
+	}
+
+	// уст. статус ответа и сообщение
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	err := json.NewEncoder(w).Encode(map[string]string{"message": "Удаление прошло успешно"})
+	if err != nil {
 		http.Error(w, "Ошибка сервера", http.StatusBadRequest)
 		return
 	}
