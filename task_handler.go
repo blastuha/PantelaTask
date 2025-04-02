@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 	"log"
 	"net/http"
@@ -66,4 +68,36 @@ func (t *TaskHandler) GetTaskList(w http.ResponseWriter, _ *http.Request) {
 	}
 
 	log.Println("Список тасок успешно отдан клиенту")
+}
+
+func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	fmt.Println("vars", vars)
+	id := vars["id"]
+
+	// формируем newTask из request
+	var newTask Task
+	if err := json.NewDecoder(r.Body).Decode(&newTask); err != nil {
+		http.Error(w, "Ошибка сервера", http.StatusBadRequest)
+		return
+	}
+
+	// Task который хотим обновить
+	var oldTask Task
+	if tx := t.db.First(&oldTask, id); tx.Error != nil {
+		http.Error(w, "Ошибка сервера", http.StatusBadRequest)
+		return
+	}
+
+	// Отправляем в базу newTask
+	if tx := t.db.Model(&oldTask).Updates(&newTask); tx.Error != nil {
+		http.Error(w, "Ошибка сервера", http.StatusBadRequest)
+		return
+	}
+
+	// возвращаем обновленного пользователя в ответе json
+	if err := json.NewEncoder(w).Encode(&newTask); err != nil {
+		http.Error(w, "Ошибка сервера", http.StatusBadRequest)
+		return
+	}
 }
