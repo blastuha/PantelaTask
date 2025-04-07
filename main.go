@@ -21,10 +21,10 @@ func main() {
 	taskHandler := NewTaskHandler(db)
 
 	router := mux.NewRouter()
-	router.HandleFunc("/api/task-list", taskHandler.GetTaskList).Methods("GET")
-	router.HandleFunc("/api/task", taskHandler.CreateTask).Methods("POST")
-	router.HandleFunc("/api/task/{id}", taskHandler.UpdateTask).Methods("PATCH")
-	router.HandleFunc("/api/task/{id}", taskHandler.DeleteTask).Methods("DELETE")
+	router.HandleFunc("/api/tasks", taskHandler.GetTaskList).Methods("GET")
+	router.HandleFunc("/api/tasks", taskHandler.CreateTask).Methods("POST")
+	router.HandleFunc("/api/tasks/{id}", taskHandler.UpdateTask).Methods("PATCH")
+	router.HandleFunc("/api/tasks/{id}", taskHandler.DeleteTask).Methods("DELETE")
 
 	err := http.ListenAndServe(":8080", router)
 

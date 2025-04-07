@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"reflect"
 )
 
 type TaskHandler struct {
@@ -94,6 +96,9 @@ func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("oldTask", oldTask)
+	fmt.Println("oldTaskType", reflect.TypeOf(oldTask))
+
 	// возвращаем обновленного пользователя в ответе json
 	if err := json.NewEncoder(w).Encode(&oldTask); err != nil {
 		http.Error(w, "Ошибка сервера", http.StatusBadRequest)
@@ -119,11 +124,5 @@ func (t *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// уст. статус ответа и сообщение
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(map[string]string{"message": "Удаление прошло успешно"})
-	if err != nil {
-		http.Error(w, "Ошибка сервера", http.StatusBadRequest)
-		return
-	}
+	w.WriteHeader(http.StatusNoContent)
 }
