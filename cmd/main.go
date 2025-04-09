@@ -30,7 +30,9 @@ func main() {
 	e.Use(middleware.Logger())
 
 	e.GET("/api/tasks", taskHandler.GetTaskList)
+	//todo: сделать валидацию по title
 	e.POST("/api/tasks", taskHandler.CreateTask)
+	//todo: сделать валидацию по title
 	e.PATCH("/api/tasks/:id", taskHandler.UpdateTask)
 	//todo: проверить как у пантелы delete метод реализован, как будто у нас разные реализации
 	e.DELETE("/api/tasks/:id", taskHandler.DeleteTask)
