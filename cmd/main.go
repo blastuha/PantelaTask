@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"log"
 	"net/http"
 	"task1/config"
@@ -25,10 +26,14 @@ func main() {
 
 	e := echo.New()
 
+	e.Use(middleware.CORS())
+	e.Use(middleware.Logger())
+
 	e.GET("/api/tasks", taskHandler.GetTaskList)
 	e.POST("/api/tasks", taskHandler.CreateTask)
-	e.PATCH("/api/tasks/{id}", taskHandler.UpdateTask)
-	e.DELETE("/api/tasks/{id}", taskHandler.DeleteTask)
+	e.PATCH("/api/tasks/:id", taskHandler.UpdateTask)
+	//todo: проверить как у пантелы delete метод реализован, как будто у нас разные реализации
+	e.DELETE("/api/tasks/:id", taskHandler.DeleteTask)
 
 	err := http.ListenAndServe(":8080", e)
 

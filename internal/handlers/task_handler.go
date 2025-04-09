@@ -19,7 +19,7 @@ func NewTaskHandler(db *gorm.DB) *TaskHandler {
 func (t *TaskHandler) CreateTask(c echo.Context) error {
 	var task models.Task
 
-	if err := c.Bind(task); err != nil {
+	if err := c.Bind(&task); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
@@ -43,7 +43,6 @@ func (t *TaskHandler) GetTaskList(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, &taskList)
 }
-
 func (t *TaskHandler) UpdateTask(c echo.Context) error {
 	id := c.Param("id")
 
