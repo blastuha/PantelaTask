@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"strings"
 	"task1/internal/dto"
 	"task1/internal/models"
 	"task1/internal/repository"
@@ -23,7 +24,7 @@ func NewTasksService(r repository.TasksRepo) TasksService {
 }
 
 func (s *tasksService) CreateTask(t *models.Task) error {
-	if t.Title == "" {
+	if strings.TrimSpace(t.Title) == "" {
 		return fmt.Errorf("task has no title")
 	}
 	if err := s.repo.CreateTask(t); err != nil {
@@ -37,7 +38,7 @@ func (s *tasksService) GetAllTasks() ([]models.Task, error) {
 }
 
 func (s *tasksService) UpdateTask(updateData *dto.TaskUpdateInput, id string) (*models.Task, error) {
-	return s.UpdateTask(updateData, id)
+	return s.repo.UpdateTask(updateData, id)
 }
 
 func (s *tasksService) DeleteTask(id string) error {
