@@ -9,6 +9,8 @@ import (
 	"task1/config"
 	"task1/internal/handlers"
 	"task1/internal/models"
+	"task1/internal/repository"
+	"task1/internal/service"
 )
 
 func main() {
@@ -22,7 +24,9 @@ func main() {
 		log.Fatalf("Ошибка AutoMigrate %v", migrateErr)
 	}
 
-	taskHandler := handlers.NewTaskHandler(db)
+	tasksRepo := repository.NewTaskRepo(db)
+	tasksService := service.NewTasksService(tasksRepo)
+	taskHandler := handlers.NewTaskHandler(tasksService)
 
 	e := echo.New()
 
