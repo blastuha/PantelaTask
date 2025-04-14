@@ -61,11 +61,6 @@ func (t *TaskHandler) UpdateTask(c echo.Context) error {
 
 func (t *TaskHandler) DeleteTask(c echo.Context) error {
 	id := c.Param("id")
-	//uuid, err := uuid.Parse(id)
-	//
-	//if err != nil {
-	//	return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid UUID"})
-	//}
 
 	if err := t.service.DeleteTask(id); err != nil {
 		if strings.Contains(err.Error(), "failed to find the task") {
