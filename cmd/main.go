@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"task1/config"
 	"task1/internal/handlers"
-	"task1/internal/models"
 	"task1/internal/repository"
 	"task1/internal/service"
 )
@@ -19,10 +18,10 @@ func main() {
 		log.Fatalf("Ошибка инициализации базы данных %v", db)
 	}
 
-	migrateErr := db.AutoMigrate(&models.Task{})
-	if migrateErr != nil {
-		log.Fatalf("Ошибка AutoMigrate %v", migrateErr)
-	}
+	//migrateErr := db.AutoMigrate(&models.Task{})
+	//if migrateErr != nil {
+	//	log.Fatalf("Ошибка AutoMigrate %v", migrateErr)
+	//}
 
 	tasksRepo := repository.NewTaskRepo(db)
 	tasksService := service.NewTasksService(tasksRepo)
