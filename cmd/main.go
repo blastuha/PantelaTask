@@ -18,11 +18,6 @@ func main() {
 		log.Fatalf("Ошибка инициализации базы данных %v", db)
 	}
 
-	//migrateErr := db.AutoMigrate(&models.Task{})
-	//if migrateErr != nil {
-	//	log.Fatalf("Ошибка AutoMigrate %v", migrateErr)
-	//}
-
 	tasksRepo := repository.NewTaskRepo(db)
 	tasksService := service.NewTasksService(tasksRepo)
 	taskHandler := handlers.NewTaskHandler(tasksService)
@@ -31,6 +26,7 @@ func main() {
 
 	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
 	e.GET("/api/tasks", taskHandler.GetTaskList)
 	e.POST("/api/tasks", taskHandler.CreateTask)
