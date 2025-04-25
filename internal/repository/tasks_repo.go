@@ -43,7 +43,10 @@ func (r *taskRepo) UpdateTask(updateData *dto.TaskUpdateInput, id string) (*mode
 		return &task, fmt.Errorf("UpdateTask: failed to find task for updating: %w", err)
 	}
 
-	if err := r.db.Model(&task).Updates(&updateData).Error; err != nil {
+	task.Title = updateData.Title
+	task.IsDone = updateData.IsDone
+
+	if err := r.db.Save(&task).Error; err != nil {
 		return &task, fmt.Errorf("UpdateTask: failed to update the task: %w", err)
 	}
 
