@@ -47,7 +47,7 @@ func (r *taskRepo) UpdateTask(updateData *dto.TaskUpdateInput, id string) (*mode
 	task.IsDone = updateData.IsDone
 
 	if err := r.db.Save(&task).Error; err != nil {
-		return &task, fmt.Errorf("UpdateTask: failed to update the task: %w", err)
+		return &task, fmt.Errorf("UpdateTask: failed to save the task: %w", err)
 	}
 
 	return &task, nil

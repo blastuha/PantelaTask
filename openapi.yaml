@@ -16,7 +16,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Task'
+              $ref: '#/components/schemas/TaskCreateInput'
       responses:
         '201':
           description: Task created successfully
@@ -139,6 +139,18 @@ components:
           type: boolean
 
     TaskUpdateInput:
+      type: object
+      properties:
+        title:
+          type: string
+        is_done:
+          type: boolean
+          example: true
+      required:
+        - title
+        - is_done
+
+    TaskCreateInput:
       type: object
       properties:
         title:
