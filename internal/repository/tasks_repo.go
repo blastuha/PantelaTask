@@ -8,7 +8,7 @@ import (
 )
 
 type TasksRepo interface {
-	CreateTask(t *models.Task) error
+	CreateTask(t *models.Task) (*models.Task, error)
 	GetAllTasks() ([]models.Task, error)
 	UpdateTask(t *dto.TaskUpdateInput, id string) (*models.Task, error)
 	DeleteTask(id string) error
@@ -22,11 +22,11 @@ func NewTaskRepo(db *gorm.DB) TasksRepo {
 	return &taskRepo{db: db}
 }
 
-func (r *taskRepo) CreateTask(t *models.Task) error {
+func (r *taskRepo) CreateTask(t *models.Task) (*models.Task, error) {
 	if err := r.db.Create(t).Error; err != nil {
-		return fmt.Errorf("CreateTask: failed to create task: %w", err)
+		return nil, fmt.Errorf("CreateTask: failed to create task: %w", err)
 	}
-	return nil
+	return t, nil
 }
 
 func (r *taskRepo) GetAllTasks() ([]models.Task, error) {

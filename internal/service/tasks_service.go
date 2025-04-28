@@ -13,7 +13,7 @@ type tasksService struct {
 }
 
 type TasksService interface {
-	CreateTask(t *models.Task) error
+	CreateTask(t *dto.TaskCreateInput) (*models.Task, error)
 	GetAllTasks() ([]models.Task, error)
 	UpdateTask(updateData *dto.TaskUpdateInput, id string) (*models.Task, error)
 	DeleteTask(id string) error
@@ -23,18 +23,22 @@ func NewTasksService(r repository.TasksRepo) TasksService {
 	return &tasksService{repo: r}
 }
 
-func (s *tasksService) CreateTask(t *models.Task) error {
-	if strings.TrimSpace(t.Title) == "" {
-		return fmt.Errorf("task has no title")
-	}
-	if err := s.repo.CreateTask(t); err != nil {
-		return fmt.Errorf("CreateTask: failed to create the task %w", err)
-	}
-	return nil
-}
-
 func (s *tasksService) GetAllTasks() ([]models.Task, error) {
 	return s.repo.GetAllTasks()
+}
+
+func (s *tasksService) CreateTask(t *dto.TaskCreateInput) (*models.Task, error) {
+	if strings.TrimSpace(t.Title) == "" {
+		return nil, fmt.Errorf("task has no title")
+	}
+
+	taskToCreate := models.Task{Title: t.Title, IsDone: t.IsDone}
+
+	createdTask, err := s.repo.CreateTask(&taskToCreate)
+	if err != nil {
+		return nil, fmt.Errorf("CreateTask: failed to create the task: %w", err)
+	}
+	return createdTask, nil
 }
 
 func (s *tasksService) UpdateTask(updateData *dto.TaskUpdateInput, id string) (*models.Task, error) {

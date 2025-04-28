@@ -18,5 +18,8 @@ migrate-down:
 run:
 	go run cmd/main.go
 
+gen:
+	oapi-codegen -config openapi/.openapi -include-tags Tasks -package tasks openapi/openapi.yaml > ./internal/web/tasks/api.gen.go
+
 
 .PHONY: run migrate migrate-down migrate-new

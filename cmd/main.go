@@ -10,6 +10,7 @@ import (
 	"task1/internal/handlers"
 	"task1/internal/repository"
 	"task1/internal/service"
+	"task1/internal/web/tasks"
 )
 
 func main() {
@@ -28,10 +29,13 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	e.GET("/api/tasks", taskHandler.GetTaskList)
-	e.POST("/api/tasks", taskHandler.CreateTask)
-	e.PATCH("/api/tasks/:id", taskHandler.UpdateTask)
-	e.DELETE("/api/tasks/:id", taskHandler.DeleteTask)
+	strictHandler := tasks.NewStrictHandler(taskHandler, nil)
+	tasks.RegisterHandlers(e, strictHandler)
+
+	//e.GET("/api/tasks", taskHandler.GetTaskList)
+	//e.POST("/api/tasks", taskHandler.CreateTask)
+	//e.PATCH("/api/tasks/:id", taskHandler.UpdateTask)
+	//e.DELETE("/api/tasks/:id", taskHandler.DeleteTask)
 
 	err := http.ListenAndServe(":8080", e)
 

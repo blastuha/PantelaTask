@@ -137,6 +137,10 @@ components:
           type: string
         is_done:
           type: boolean
+      required:
+            - id
+            - title
+            - is_done
 
     TaskUpdateInput:
       type: object
