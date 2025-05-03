@@ -1,14 +1,12 @@
-package handlers
+package tasksService
 
 import (
 	"context"
-	"task1/internal/dto"
-	"task1/internal/service"
 	"task1/internal/web/tasks"
 )
 
 type TaskHandler struct {
-	service service.TasksService
+	service tasksService.TasksService
 }
 
 func (t *TaskHandler) GetTaskList(_ context.Context, _ tasks.GetTaskListRequestObject) (tasks.GetTaskListResponseObject, error) {
@@ -31,7 +29,7 @@ func (t *TaskHandler) CreateTask(_ context.Context, request tasks.CreateTaskRequ
 	taskRequest := request.Body
 	var response tasks.CreateTask201JSONResponse
 
-	taskToCreate := dto.TaskCreateInput{Title: taskRequest.Title, IsDone: taskRequest.IsDone}
+	taskToCreate := tasksService.TaskCreateInput{Title: taskRequest.Title, IsDone: taskRequest.IsDone}
 
 	createdTask, err := t.service.CreateTask(&taskToCreate)
 
@@ -57,7 +55,7 @@ func (t *TaskHandler) UpdateTask(_ context.Context, request tasks.UpdateTaskRequ
 	requestBody := request.Body
 	requestId := request.Id
 
-	taskToUpdate := dto.TaskUpdateInput{
+	taskToUpdate := tasksService.TaskUpdateInput{
 		Title:  requestBody.Title,
 		IsDone: requestBody.IsDone,
 	}
@@ -76,6 +74,6 @@ func (t *TaskHandler) UpdateTask(_ context.Context, request tasks.UpdateTaskRequ
 	return response, nil
 }
 
-func NewTaskHandler(service service.TasksService) *TaskHandler {
+func NewTaskHandler(service tasksService.TasksService) *TaskHandler {
 	return &TaskHandler{service: service}
 }

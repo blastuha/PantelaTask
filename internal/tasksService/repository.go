@@ -1,16 +1,14 @@
-package repository
+package tasksService
 
 import (
 	"fmt"
 	"gorm.io/gorm"
-	"task1/internal/dto"
-	"task1/internal/models"
 )
 
 type TasksRepo interface {
-	CreateTask(t *models.Task) (*models.Task, error)
-	GetAllTasks() ([]models.Task, error)
-	UpdateTask(t *dto.TaskUpdateInput, id string) (*models.Task, error)
+	CreateTask(t *Task) (*Task, error)
+	GetAllTasks() ([]Task, error)
+	UpdateTask(t *tasksService.TaskUpdateInput, id string) (*Task, error)
 	DeleteTask(id string) error
 }
 
@@ -22,23 +20,23 @@ func NewTaskRepo(db *gorm.DB) TasksRepo {
 	return &taskRepo{db: db}
 }
 
-func (r *taskRepo) CreateTask(t *models.Task) (*models.Task, error) {
+func (r *taskRepo) CreateTask(t *Task) (*Task, error) {
 	if err := r.db.Create(t).Error; err != nil {
 		return nil, fmt.Errorf("CreateTask: failed to create task: %w", err)
 	}
 	return t, nil
 }
 
-func (r *taskRepo) GetAllTasks() ([]models.Task, error) {
-	var taskList []models.Task
+func (r *taskRepo) GetAllTasks() ([]Task, error) {
+	var taskList []Task
 	if err := r.db.Find(&taskList).Error; err != nil {
 		return taskList, fmt.Errorf("GetAllTasks: failed to get tasks: %w", err)
 	}
 	return taskList, nil
 }
 
-func (r *taskRepo) UpdateTask(updateData *dto.TaskUpdateInput, id string) (*models.Task, error) {
-	var task models.Task
+func (r *taskRepo) UpdateTask(updateData *tasksService.TaskUpdateInput, id string) (*Task, error) {
+	var task Task
 	if err := r.db.First(&task, id).Error; err != nil {
 		return &task, fmt.Errorf("UpdateTask: failed to find task for updating: %w", err)
 	}
@@ -54,7 +52,7 @@ func (r *taskRepo) UpdateTask(updateData *dto.TaskUpdateInput, id string) (*mode
 }
 
 func (r *taskRepo) DeleteTask(id string) error {
-	var task models.Task
+	var task Task
 	if err := r.db.First(&task, id).Error; err != nil {
 		return fmt.Errorf("DeleteTask: failed to find the task: %w", err)
 	}

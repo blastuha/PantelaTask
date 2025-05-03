@@ -1,4 +1,4 @@
-package dto
+package tasksService
 
 type TaskUpdateInput struct {
 	Title  string `json:"title"`

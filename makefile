@@ -14,12 +14,24 @@ migrate:
 migrate-down:
 	$(MIGRATE) down
 
+# Откат миграций с указанием количества шагов
+migrate-down-steps:
+	$(MIGRATE) down $(n)
+
+# Принудительное выставление версии
+migrate-force:
+	$(MIGRATE) force $(v)
+
+
 # Запуск приложения
 run:
 	go run cmd/main.go
 
 gen:
 	oapi-codegen -config openapi/.openapi -include-tags Tasks -package tasks openapi/openapi.yaml > ./internal/web/tasks/api.gen.go
+
+lint:
+	golangci-lint run --output.text.colors=true
 
 
 .PHONY: run migrate migrate-down migrate-new

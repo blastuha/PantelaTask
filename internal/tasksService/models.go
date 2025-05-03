@@ -1,4 +1,4 @@
-package models
+package tasksService
 
 import (
 	"gorm.io/gorm"

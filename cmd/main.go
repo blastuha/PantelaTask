@@ -7,9 +7,7 @@ import (
 	"log"
 	"net/http"
 	"task1/config"
-	"task1/internal/handlers"
-	"task1/internal/repository"
-	"task1/internal/service"
+	"task1/internal/tasksService"
 	"task1/internal/web/tasks"
 )
 
@@ -19,9 +17,9 @@ func main() {
 		log.Fatalf("Ошибка инициализации базы данных %v", db)
 	}
 
-	tasksRepo := repository.NewTaskRepo(db)
-	tasksService := service.NewTasksService(tasksRepo)
-	taskHandler := handlers.NewTaskHandler(tasksService)
+	tasksRepo := tasksService.NewTaskRepo(db)
+	tasksService := tasksService.NewTasksService(tasksRepo)
+	taskHandler := tasksService.NewTaskHandler(tasksService)
 
 	e := echo.New()
 
