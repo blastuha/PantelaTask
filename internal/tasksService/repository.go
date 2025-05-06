@@ -1,6 +1,7 @@
 package tasksService
 
 import (
+	"errors"
 	"fmt"
 	"gorm.io/gorm"
 )
@@ -8,7 +9,7 @@ import (
 type TasksRepo interface {
 	CreateTask(t *Task) (*Task, error)
 	GetAllTasks() ([]Task, error)
-	UpdateTask(t *tasksService.TaskUpdateInput, id string) (*Task, error)
+	UpdateTask(t *TaskUpdateInput, id string) (*Task, error)
 	DeleteTask(id string) error
 }
 
@@ -35,10 +36,13 @@ func (r *taskRepo) GetAllTasks() ([]Task, error) {
 	return taskList, nil
 }
 
-func (r *taskRepo) UpdateTask(updateData *tasksService.TaskUpdateInput, id string) (*Task, error) {
+func (r *taskRepo) UpdateTask(updateData *TaskUpdateInput, id string) (*Task, error) {
 	var task Task
 	if err := r.db.First(&task, id).Error; err != nil {
-		return &task, fmt.Errorf("UpdateTask: failed to find task for updating: %w", err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrTaskNoFound
+		}
+		return nil, fmt.Errorf("UpdateTask: failed to find task for updating: %w", err)
 	}
 
 	task.Title = updateData.Title

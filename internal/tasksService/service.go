@@ -26,7 +26,7 @@ func (s *tasksService) GetAllTasks() ([]Task, error) {
 
 func (s *tasksService) CreateTask(t *TaskCreateInput) (*Task, error) {
 	if strings.TrimSpace(t.Title) == "" {
-		return nil, fmt.Errorf("task has no title")
+		return nil, ErrInvalidInput
 	}
 
 	taskToCreate := Task{Title: t.Title, IsDone: t.IsDone}
@@ -39,6 +39,10 @@ func (s *tasksService) CreateTask(t *TaskCreateInput) (*Task, error) {
 }
 
 func (s *tasksService) UpdateTask(updateData *TaskUpdateInput, id string) (*Task, error) {
+	if strings.TrimSpace(updateData.Title) == "" {
+		return nil, ErrInvalidInput
+	}
+
 	return s.repo.UpdateTask(updateData, id)
 }
 

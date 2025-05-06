@@ -2,11 +2,12 @@ package tasksService
 
 import (
 	"context"
+	"errors"
 	"task1/internal/web/tasks"
 )
 
 type TaskHandler struct {
-	service tasksService.TasksService
+	service TasksService
 }
 
 func (t *TaskHandler) GetTaskList(_ context.Context, _ tasks.GetTaskListRequestObject) (tasks.GetTaskListResponseObject, error) {
@@ -29,11 +30,15 @@ func (t *TaskHandler) CreateTask(_ context.Context, request tasks.CreateTaskRequ
 	taskRequest := request.Body
 	var response tasks.CreateTask201JSONResponse
 
-	taskToCreate := tasksService.TaskCreateInput{Title: taskRequest.Title, IsDone: taskRequest.IsDone}
+	taskToCreate := TaskCreateInput{Title: taskRequest.Title, IsDone: taskRequest.IsDone}
 
 	createdTask, err := t.service.CreateTask(&taskToCreate)
 
 	if err != nil {
+		if errors.Is(err, ErrInvalidInput) {
+			return tasks.CreateTask400JSONResponse{Error: "Task has no title"}, nil
+		}
+
 		return nil, err
 	}
 
@@ -55,14 +60,23 @@ func (t *TaskHandler) UpdateTask(_ context.Context, request tasks.UpdateTaskRequ
 	requestBody := request.Body
 	requestId := request.Id
 
-	taskToUpdate := tasksService.TaskUpdateInput{
+	taskToUpdate := TaskUpdateInput{
 		Title:  requestBody.Title,
 		IsDone: requestBody.IsDone,
 	}
 
 	updatedTask, err := t.service.UpdateTask(&taskToUpdate, requestId)
 	if err != nil {
-		return nil, err
+
+		switch {
+		case errors.Is(err, ErrTaskNoFound):
+			return tasks.UpdateTask404JSONResponse{Error: "Task not found"}, nil
+		case errors.Is(err, ErrInvalidInput):
+			return tasks.UpdateTask400JSONResponse{Error: "Task has no title"}, nil
+		default:
+			return nil, err
+		}
+
 	}
 
 	response := tasks.UpdateTask200JSONResponse{
@@ -74,6 +88,6 @@ func (t *TaskHandler) UpdateTask(_ context.Context, request tasks.UpdateTaskRequ
 	return response, nil
 }
 
-func NewTaskHandler(service tasksService.TasksService) *TaskHandler {
+func NewTaskHandler(service TasksService) *TaskHandler {
 	return &TaskHandler{service: service}
 }

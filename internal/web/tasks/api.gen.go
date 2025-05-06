@@ -16,7 +16,7 @@ import (
 
 // Error defines model for Error.
 type Error struct {
-	Error *string `json:"error,omitempty"`
+	Error string `json:"error"`
 }
 
 // Task defines model for Task.
@@ -267,6 +267,15 @@ type UpdateTask400JSONResponse Error
 func (response UpdateTask400JSONResponse) VisitUpdateTaskResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateTask404JSONResponse Error
+
+func (response UpdateTask404JSONResponse) VisitUpdateTaskResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
 
 	return json.NewEncoder(w).Encode(response)
 }

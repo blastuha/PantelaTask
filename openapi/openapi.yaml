@@ -95,6 +95,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 
     delete:
       summary: Delete a task by ID
@@ -168,7 +175,10 @@ components:
 
     Error:
       type: object
+      required:
+        - error
       properties:
         error:
           type: string
           example: "Invalid request"
+

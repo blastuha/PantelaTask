@@ -18,8 +18,8 @@ func main() {
 	}
 
 	tasksRepo := tasksService.NewTaskRepo(db)
-	tasksService := tasksService.NewTasksService(tasksRepo)
-	taskHandler := tasksService.NewTaskHandler(tasksService)
+	tasksSvc := tasksService.NewTasksService(tasksRepo)
+	taskHandler := tasksService.NewTaskHandler(tasksSvc)
 
 	e := echo.New()
 
@@ -29,11 +29,6 @@ func main() {
 
 	strictHandler := tasks.NewStrictHandler(taskHandler, nil)
 	tasks.RegisterHandlers(e, strictHandler)
-
-	//e.GET("/api/tasks", taskHandler.GetTaskList)
-	//e.POST("/api/tasks", taskHandler.CreateTask)
-	//e.PATCH("/api/tasks/:id", taskHandler.UpdateTask)
-	//e.DELETE("/api/tasks/:id", taskHandler.DeleteTask)
 
 	err := http.ListenAndServe(":8080", e)
 
