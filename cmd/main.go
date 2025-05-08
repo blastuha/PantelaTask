@@ -30,6 +30,8 @@ func main() {
 	strictHandler := tasks.NewStrictHandler(taskHandler, nil)
 	tasks.RegisterHandlers(e, strictHandler)
 
+	//usersStrictHandler := users.NewStrictHandler()
+
 	err := http.ListenAndServe(":8080", e)
 
 	if err != nil {

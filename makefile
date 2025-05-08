@@ -27,8 +27,17 @@ migrate-force:
 run:
 	go run cmd/main.go
 
-gen:
+# генерируем таски
+gen-tasks:
 	oapi-codegen -config openapi/.openapi -include-tags Tasks -package tasks openapi/openapi.yaml > ./internal/web/tasks/api.gen.go
+
+# генерируем пользователей
+gen-users:
+	oapi-codegen \
+	  -config openapi/.openapi \
+	  -include-tags Users \
+	  -package users \
+	  openapi/openapi.yaml > internal/web/users/api.gen.go
 
 lint:
 	golangci-lint run --output.text.colors=true

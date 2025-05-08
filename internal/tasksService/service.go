@@ -43,7 +43,15 @@ func (s *tasksService) UpdateTask(updateData *TaskUpdateInput, id string) (*Task
 		return nil, ErrInvalidInput
 	}
 
-	return s.repo.UpdateTask(updateData, id)
+	task, err := s.repo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	task.Title = updateData.Title
+	task.IsDone = updateData.IsDone
+
+	return s.repo.UpdateTask(task)
 }
 
 func (s *tasksService) DeleteTask(id string) error {
