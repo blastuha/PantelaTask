@@ -8,7 +8,9 @@ import (
 	"net/http"
 	"task1/config"
 	"task1/internal/tasksService"
+	"task1/internal/usersService"
 	"task1/internal/web/tasks"
+	"task1/internal/web/users"
 )
 
 func main() {
@@ -21,6 +23,10 @@ func main() {
 	tasksSvc := tasksService.NewTasksService(tasksRepo)
 	taskHandler := tasksService.NewTaskHandler(tasksSvc)
 
+	usersRepo := usersService.NewUsersRepo(db)
+	usersSvc := usersService.NewUsersService(usersRepo)
+	usersHandler := usersService.NewUsersHandler(usersSvc)
+
 	e := echo.New()
 
 	e.Use(middleware.CORS())
@@ -30,7 +36,8 @@ func main() {
 	strictHandler := tasks.NewStrictHandler(taskHandler, nil)
 	tasks.RegisterHandlers(e, strictHandler)
 
-	//usersStrictHandler := users.NewStrictHandler()
+	usersStrict := users.NewStrictHandler(usersHandler, nil)
+	users.RegisterHandlers(e, usersStrict)
 
 	err := http.ListenAndServe(":8080", e)
 

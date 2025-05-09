@@ -53,6 +53,9 @@ type ServerInterface interface {
 	// Create a new user
 	// (POST /users)
 	CreateUser(ctx echo.Context) error
+	// Delete user
+	// (DELETE /users/{id})
+	DeleteUser(ctx echo.Context, id string) error
 	// Update user
 	// (PUT /users/{id})
 	UpdateUser(ctx echo.Context, id string) error
@@ -78,6 +81,22 @@ func (w *ServerInterfaceWrapper) CreateUser(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CreateUser(ctx)
+	return err
+}
+
+// DeleteUser converts echo context to params.
+func (w *ServerInterfaceWrapper) DeleteUser(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.DeleteUser(ctx, id)
 	return err
 }
 
@@ -127,6 +146,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 
 	router.GET(baseURL+"/users", wrapper.GetAllUsers)
 	router.POST(baseURL+"/users", wrapper.CreateUser)
+	router.DELETE(baseURL+"/users/:id", wrapper.DeleteUser)
 	router.PUT(baseURL+"/users/:id", wrapper.UpdateUser)
 
 }
@@ -191,6 +211,40 @@ func (response CreateUser500JSONResponse) VisitCreateUserResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
+type DeleteUserRequestObject struct {
+	Id string `json:"id"`
+}
+
+type DeleteUserResponseObject interface {
+	VisitDeleteUserResponse(w http.ResponseWriter) error
+}
+
+type DeleteUser204Response struct {
+}
+
+func (response DeleteUser204Response) VisitDeleteUserResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteUser404JSONResponse Error
+
+func (response DeleteUser404JSONResponse) VisitDeleteUserResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteUser500JSONResponse Error
+
+func (response DeleteUser500JSONResponse) VisitDeleteUserResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type UpdateUserRequestObject struct {
 	Id   string `json:"id"`
 	Body *UpdateUserJSONRequestBody
@@ -244,6 +298,9 @@ type StrictServerInterface interface {
 	// Create a new user
 	// (POST /users)
 	CreateUser(ctx context.Context, request CreateUserRequestObject) (CreateUserResponseObject, error)
+	// Delete user
+	// (DELETE /users/{id})
+	DeleteUser(ctx context.Context, request DeleteUserRequestObject) (DeleteUserResponseObject, error)
 	// Update user
 	// (PUT /users/{id})
 	UpdateUser(ctx context.Context, request UpdateUserRequestObject) (UpdateUserResponseObject, error)
@@ -307,6 +364,31 @@ func (sh *strictHandler) CreateUser(ctx echo.Context) error {
 		return err
 	} else if validResponse, ok := response.(CreateUserResponseObject); ok {
 		return validResponse.VisitCreateUserResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// DeleteUser operation middleware
+func (sh *strictHandler) DeleteUser(ctx echo.Context, id string) error {
+	var request DeleteUserRequestObject
+
+	request.Id = id
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteUser(ctx.Request().Context(), request.(DeleteUserRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteUser")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(DeleteUserResponseObject); ok {
+		return validResponse.VisitDeleteUserResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
 	}
