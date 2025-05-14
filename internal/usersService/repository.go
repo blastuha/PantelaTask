@@ -4,17 +4,43 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"task1/internal/tasksService"
 )
 
 type UsersRepo interface {
 	GetAllUsers() ([]User, error)
+	GetTasksForUser(id uint) ([]tasksService.Task, error)
 	CreateUser(u *User) (*User, error)
 	UpdateUser(u *User) (*User, error)
 	DeleteUser(id string) error
+	GetUserByID(id string) (*User, error)
 }
 
 type usersRepo struct {
 	db *gorm.DB
+}
+
+func (repo *usersRepo) GetUserByID(id string) (*User, error) {
+	var u User
+	if err := repo.db.First(&u, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrUserNoFound
+		}
+		return nil, err
+	}
+	return &u, nil
+}
+
+func (repo *usersRepo) GetTasksForUser(id uint) ([]tasksService.Task, error) {
+	var tasks []tasksService.Task
+	if err := repo.db.
+		Where("user_id = ?", uint(id)).
+		Find(&tasks).
+		Error; err != nil {
+		return nil, fmt.Errorf("usersRepo.GetTasksForUser: %w", err)
+	}
+
+	return tasks, nil
 }
 
 func NewUsersRepo(db *gorm.DB) UsersRepo {

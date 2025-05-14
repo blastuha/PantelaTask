@@ -24,6 +24,7 @@ type Task struct {
 	Id     int64  `json:"id"`
 	IsDone bool   `json:"is_done"`
 	Title  string `json:"title"`
+	UserId *int64 `json:"user_id,omitempty"`
 }
 
 // TaskCreateInput defines model for TaskCreateInput.

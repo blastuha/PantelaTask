@@ -3,7 +3,7 @@ package usersService
 import (
 	"errors"
 	"fmt"
-	"gorm.io/gorm"
+	"task1/internal/tasksService"
 	"task1/internal/web/users"
 )
 
@@ -12,10 +12,22 @@ type UsersService interface {
 	CreateUser(in users.CreateUserRequest) (*User, error)
 	UpdateUser(id string, in users.UpdateUserRequest) (*User, error)
 	DeleteUser(id string) error
+	GetTasksForUser(id uint) ([]tasksService.Task, error)
 }
 
 type usersService struct {
 	repo UsersRepo
+}
+
+func (u *usersService) GetTasksForUser(id uint) ([]tasksService.Task, error) {
+	tasks, err := u.repo.GetTasksForUser(id)
+	if errors.Is(err, ErrUserNoFound) {
+		return nil, ErrUserNoFound
+	}
+	if err != nil {
+		return nil, fmt.Errorf("usersService.GetTasksForUser: %w", err)
+	}
+	return tasks, nil
 }
 
 func NewUsersService(repo UsersRepo) UsersService {
@@ -50,12 +62,9 @@ func (u *usersService) CreateUser(in users.CreateUserRequest) (*User, error) {
 }
 
 func (u *usersService) UpdateUser(id string, in users.UpdateUserRequest) (*User, error) {
-	var existingUser User
-	if err := u.repo.(*usersRepo).db.First(&existingUser, id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrUserNoFound
-		}
-		return nil, fmt.Errorf("usersService.UpdateUser: %w", err)
+	existingUser, err := u.repo.GetUserByID(id)
+	if err != nil {
+		return nil, err
 	}
 
 	if in.Email != nil {
@@ -68,7 +77,7 @@ func (u *usersService) UpdateUser(id string, in users.UpdateUserRequest) (*User,
 		existingUser.Password = *in.Password
 	}
 
-	updatedUser, err := u.repo.UpdateUser(&existingUser)
+	updatedUser, err := u.repo.UpdateUser(existingUser)
 	if err != nil {
 		return nil, fmt.Errorf("usersService.UpdateUser: %w", err)
 	}
