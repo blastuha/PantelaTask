@@ -49,7 +49,7 @@ func NewUsersRepo(db *gorm.DB) UsersRepo {
 
 func (repo *usersRepo) GetAllUsers() ([]User, error) {
 	var users []User
-	if err := repo.db.Find(&users).Error; err != nil {
+	if err := repo.db.Preload("Tasks").Find(&users).Error; err != nil {
 		return nil, fmt.Errorf("usersRepo.GetAllUsers: %w", err)
 	}
 

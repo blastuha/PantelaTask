@@ -326,9 +326,14 @@ components:
         is_done:
           type: boolean
           example: true
+        user_id:
+          type: integer
+          format: int64
+          minimum: 0
       required:
         - title
         - is_done
+        - user_id
     UserResponse:
       type: object
       properties:

@@ -31,6 +31,7 @@ type Task struct {
 type TaskCreateInput struct {
 	IsDone bool   `json:"is_done"`
 	Title  string `json:"title"`
+	UserId int64  `json:"user_id"`
 }
 
 // TaskUpdateInput defines model for TaskUpdateInput.

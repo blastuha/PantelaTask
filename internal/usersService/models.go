@@ -19,8 +19,26 @@ func toUserResponse(u *User) api.UserResponse {
 	}
 	id := int64(u.ID)
 	email := u.Email
+
+	tasks := make([]api.Task, len(u.Tasks))
+
+	for i, modelTask := range u.Tasks {
+		var responseTask api.Task
+
+		taskID := int64(modelTask.ID)
+		userID := int64(modelTask.UserID)
+
+		responseTask.Id = taskID
+		responseTask.UserId = &userID
+		responseTask.Title = modelTask.Title
+		responseTask.IsDone = modelTask.IsDone
+
+		tasks[i] = responseTask
+	}
+
 	return api.UserResponse{
 		Id:    &id,
 		Email: &email,
+		Tasks: &tasks,
 	}
 }

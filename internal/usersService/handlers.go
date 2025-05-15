@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
+	"task1/internal/utils"
 
 	api "task1/internal/web/users"
 )
@@ -23,10 +23,11 @@ func (h *usersHandler) GetTasksForUser(
 ) (api.GetTasksForUserResponseObject, error) {
 	rawID := request.Id
 
-	uid64, err := strconv.ParseUint(rawID, 10, 64)
+	uid64, err := utils.ParseUintID(rawID)
 	if err != nil {
 		return api.GetTasksForUser400JSONResponse{Error: "invalid user ID"}, nil
 	}
+
 	userID := uint(uid64)
 
 	tasks, err := h.svc.GetTasksForUser(userID)

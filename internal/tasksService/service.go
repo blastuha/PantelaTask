@@ -3,6 +3,7 @@ package tasksService
 import (
 	"fmt"
 	"strings"
+	api "task1/internal/web/tasks"
 )
 
 type tasksService struct {
@@ -10,9 +11,9 @@ type tasksService struct {
 }
 
 type TasksService interface {
-	CreateTask(t *TaskCreateInput) (*Task, error)
+	CreateTask(t *api.TaskCreateInput) (*Task, error)
 	GetAllTasks() ([]Task, error)
-	UpdateTask(updateData *TaskUpdateInput, id string) (*Task, error)
+	UpdateTask(updateData *api.TaskUpdateInput, id string) (*Task, error)
 	DeleteTask(id string) error
 }
 
@@ -24,12 +25,12 @@ func (s *tasksService) GetAllTasks() ([]Task, error) {
 	return s.repo.GetAllTasks()
 }
 
-func (s *tasksService) CreateTask(t *TaskCreateInput) (*Task, error) {
+func (s *tasksService) CreateTask(t *api.TaskCreateInput) (*Task, error) {
 	if strings.TrimSpace(t.Title) == "" {
 		return nil, ErrInvalidInput
 	}
 
-	taskToCreate := Task{Title: t.Title, IsDone: t.IsDone}
+	taskToCreate := Task{Title: t.Title, IsDone: t.IsDone, UserID: uint(t.UserId)}
 
 	createdTask, err := s.repo.CreateTask(&taskToCreate)
 	if err != nil {
@@ -38,7 +39,7 @@ func (s *tasksService) CreateTask(t *TaskCreateInput) (*Task, error) {
 	return createdTask, nil
 }
 
-func (s *tasksService) UpdateTask(updateData *TaskUpdateInput, id string) (*Task, error) {
+func (s *tasksService) UpdateTask(updateData *api.TaskUpdateInput, id string) (*Task, error) {
 	if strings.TrimSpace(updateData.Title) == "" {
 		return nil, ErrInvalidInput
 	}
