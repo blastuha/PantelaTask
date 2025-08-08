@@ -40,7 +40,7 @@ func (h *usersHandler) GetTasksForUser(
 
 	resp := make(api.GetTasksForUser200JSONResponse, len(tasks))
 	for i, t := range tasks {
-		resp[i] = api.Task{Id: int64(t.ID), Title: t.Title, IsDone: t.IsDone}
+		resp[i] = api.Task{Id: uint32(t.ID), Title: t.Title, IsDone: t.IsDone}
 	}
 	return resp, nil
 }

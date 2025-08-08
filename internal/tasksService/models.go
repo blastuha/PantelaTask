@@ -1,8 +1,9 @@
 package tasksService
 
 import (
-	"gorm.io/gorm"
 	api "task1/internal/web/tasks"
+
+	"gorm.io/gorm"
 )
 
 type Task struct {
@@ -14,7 +15,7 @@ type Task struct {
 
 func (t *Task) ToResponse() api.CreateTask201JSONResponse {
 	return api.CreateTask201JSONResponse{
-		Id:     int64(t.ID),
+		Id:     uint32(t.ID),
 		Title:  t.Title,
 		IsDone: t.IsDone,
 	}

@@ -1,9 +1,10 @@
 package usersService
 
 import (
-	"gorm.io/gorm"
 	"task1/internal/tasksService"
 	api "task1/internal/web/users"
+
+	"gorm.io/gorm"
 )
 
 type User struct {
@@ -17,7 +18,7 @@ func toUserResponse(u *User) api.UserResponse {
 	if u == nil {
 		return api.UserResponse{}
 	}
-	id := int64(u.ID)
+	id := uint32(u.ID)
 	email := u.Email
 
 	tasks := make([]api.Task, len(u.Tasks))
@@ -25,8 +26,8 @@ func toUserResponse(u *User) api.UserResponse {
 	for i, modelTask := range u.Tasks {
 		var responseTask api.Task
 
-		taskID := int64(modelTask.ID)
-		userID := int64(modelTask.UserID)
+		taskID := uint32(modelTask.ID)
+		userID := uint32(modelTask.UserID)
 
 		responseTask.Id = taskID
 		responseTask.UserId = &userID

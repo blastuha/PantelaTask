@@ -19,7 +19,7 @@ func (t *TaskHandler) GetTaskList(_ context.Context, _ api.GetTaskListRequestObj
 	response := api.GetTaskList200JSONResponse{}
 
 	for _, tsk := range allTasks {
-		task := api.Task{Id: int64(tsk.ID), Title: tsk.Title, IsDone: tsk.IsDone}
+		task := api.Task{Id: uint32(tsk.ID), Title: tsk.Title, IsDone: tsk.IsDone}
 		response = append(response, task)
 	}
 
@@ -80,7 +80,7 @@ func (t *TaskHandler) UpdateTask(_ context.Context, request api.UpdateTaskReques
 	}
 
 	response := api.UpdateTask200JSONResponse{
-		Id:     int64(updatedTask.ID),
+		Id:     uint32(updatedTask.ID),
 		Title:  updatedTask.Title,
 		IsDone: updatedTask.IsDone,
 	}

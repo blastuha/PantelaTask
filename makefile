@@ -27,6 +27,11 @@ migrate-force:
 run:
 	go run cmd/main.go
 
+# генерируем все
+gen-all:
+	make gen-tasks
+	make gen-users
+
 # генерируем таски
 gen-tasks:
 	oapi-codegen -config openapi/.openapi -include-tags Tasks -package tasks openapi/openapi.yaml > ./internal/web/tasks/api.gen.go
